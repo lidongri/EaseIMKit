@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) EaseChatBarEmoticonView *moreEmoticonView;
 @property (nonatomic, strong) EMMoreFunctionView *moreFunctionView;
 @property (nonatomic, copy, nullable) EaseMessageModel *quoteMessage;
+@property (nonatomic, strong) UIView *bottomLine;//下划线
 
 - (instancetype)initWithViewModel:(EaseChatViewModel *)viewModel;
 

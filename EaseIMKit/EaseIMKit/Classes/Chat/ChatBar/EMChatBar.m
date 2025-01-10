@@ -27,7 +27,6 @@
 @property (nonatomic, strong) UIButton *conversationToolBarBtn;//更多
 @property (nonatomic, strong) UIButton *emojiButton;//表情
 @property (nonatomic, strong) UIButton *audioButton;//语音
-@property (nonatomic, strong) UIView *bottomLine;//下划线
 //@property (nonatomic, strong) UIButton *audioDescBtn;
 @property (nonatomic, strong) EaseChatViewModel *viewModel;
 @property (nonatomic, strong) UIView *quoteView;

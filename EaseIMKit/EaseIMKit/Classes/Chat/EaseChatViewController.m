@@ -221,7 +221,7 @@
         make.top.equalTo(self.view);
         make.left.equalTo(self.view);
         make.right.equalTo(self.view);
-        make.bottom.equalTo(self.chooseView.ease_top);
+        make.bottom.equalTo(self.chooseView.ease_top).offset(-ceilf([UIScreen mainScreen].bounds.size.width/375.0*40));
     }];
 }
 
@@ -524,7 +524,7 @@
 {
     [self hideLongPressView];
     [self.tableView Ease_updateConstraints:^(EaseConstraintMaker *make) {
-        make.bottom.equalTo(self.chooseView.ease_top);
+        make.bottom.equalTo(self.chooseView.ease_top).offset(-ceilf([UIScreen mainScreen].bounds.size.width/375.0*40));
     }];
     
     [self performSelector:@selector(scrollToBottomRow) withObject:nil afterDelay:0.1];
@@ -1002,10 +1002,12 @@
         [self.chatBar Ease_updateConstraints:^(EaseConstraintMaker *make) {
             make.bottom.equalTo(self.view).offset(-keyBoardHeight);
         }];
+        [self.chatBar.superview layoutIfNeeded];
+        [self scrollToBottomRow];
     };
     [self keyBoardWillShow:note animations:animation completion:^(BOOL finished, CGRect keyBoardBounds) {
         if (finished) {
-            [self performSelector:@selector(scrollToBottomRow) withObject:nil afterDelay:0.1];
+//            [self performSelector:@selector(scrollToBottomRow) withObject:nil afterDelay:0.1];
         }
     }];
 }
@@ -1017,11 +1019,13 @@
         [self.chatBar Ease_updateConstraints:^(EaseConstraintMaker *make) {
             make.bottom.equalTo(self.view);
         }];
+        [self.chatBar.superview layoutIfNeeded];
+        [self scrollToBottomRow];
     };
     [[NSNotificationCenter defaultCenter] postNotificationName:@"BWConsultUpdateOrderButtonNotify" object:[NSString stringWithFormat:@"%f",EMVIEWBOTTOMMARGIN]];
     [self keyBoardWillHide:note animations:animation completion:^(BOOL finished) {
         if (finished) {
-            [self performSelector:@selector(scrollToBottomRow) withObject:nil afterDelay:0.1];
+//            [self performSelector:@selector(scrollToBottomRow) withObject:nil afterDelay:0.1];
         }
     }];
 }
