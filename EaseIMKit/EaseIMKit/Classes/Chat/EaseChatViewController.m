@@ -35,6 +35,7 @@
 #import "LoginViewModel.h"
 #import "UserInfoStore.h"
 #import "EMChatMessage+EaseUIExt.h"
+#import <MJRefresh/MJRefresh.h>
 
 @interface EaseChatViewController ()<UIScrollViewDelegate, UITableViewDelegate, UITableViewDataSource, EMChatManagerDelegate, EMChatBarDelegate, EaseMessageCellDelegate, EaseChatBarEmoticonViewDelegate, EMChatBarRecordAudioViewDelegate, EMMoreFunctionViewDelegate>
 {
@@ -234,6 +235,26 @@
 -(void)setRole:(NSString *)role
 {
     _role = role;
+}
+
+-(void)setComeHomeCounselor:(NSInteger)comeHomeCounselor
+{
+    _comeHomeCounselor = comeHomeCounselor;
+    if (comeHomeCounselor == 1) {
+        [self.tableView Ease_remakeConstraints:^(EaseConstraintMaker *make) {
+            make.top.equalTo(self.view);
+            make.left.equalTo(self.view);
+            make.right.equalTo(self.view);
+            make.bottom.equalTo(self.chooseView.ease_top).offset(-ceilf([UIScreen mainScreen].bounds.size.width/375.0*40));
+        }];
+    } else {
+        [self.tableView Ease_remakeConstraints:^(EaseConstraintMaker *make) {
+            make.top.equalTo(self.view);
+            make.left.equalTo(self.view);
+            make.right.equalTo(self.view);
+            make.bottom.equalTo(self.chooseView.ease_top).offset(0);
+        }];
+    }
 }
 
 - (void)_setupChatBarMoreViews
@@ -523,9 +544,15 @@
 - (void)chatBarDidShowMoreViewAction
 {
     [self hideLongPressView];
-    [self.tableView Ease_updateConstraints:^(EaseConstraintMaker *make) {
-        make.bottom.equalTo(self.chooseView.ease_top).offset(-ceilf([UIScreen mainScreen].bounds.size.width/375.0*40));
-    }];
+    if (self.comeHomeCounselor == 1) {
+        [self.tableView Ease_updateConstraints:^(EaseConstraintMaker *make) {
+            make.bottom.equalTo(self.chooseView.ease_top).offset(-ceilf([UIScreen mainScreen].bounds.size.width/375.0*40));
+        }];
+    } else {
+        [self.tableView Ease_updateConstraints:^(EaseConstraintMaker *make) {
+            make.bottom.equalTo(self.chooseView.ease_top).offset(0);
+        }];
+    }
     
     [self performSelector:@selector(scrollToBottomRow) withObject:nil afterDelay:0.1];
 }
@@ -1142,6 +1169,13 @@
                     [weakself.tableView endRefreshing];
                 }
                 [weakself refreshTableView:isScrollBottom];
+                if (isScrollBottom) {
+                    
+                } else {
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                        [weakself.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:formated.count-1 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+                    });
+                }
             });
         });
     } else {
@@ -1153,6 +1187,7 @@
 
 - (void)dropdownRefreshTableViewWithData
 {
+    [self.tableView.mj_header endRefreshing];
     if (self.delegate && [self.delegate respondsToSelector:@selector(loadMoreMessageData:currentMessageList:)]) {
         [self.delegate loadMoreMessageData:self.moreMsgId currentMessageList:[self.messageList copy]];
     } else {
@@ -1287,12 +1322,13 @@
         _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         _tableView.estimatedRowHeight = 130;
         _tableView.backgroundColor = [UIColor systemPinkColor];
-        [_tableView enableRefresh:EaseLocalizableString(@"dropRefresh", nil) color:UIColor.redColor];
-        if (@available(iOS 10.0, *)) {
-            [_tableView.refreshControl addTarget:self action:@selector(dropdownRefreshTableViewWithData) forControlEvents:UIControlEventValueChanged];
-        } else {
-            // Fallback on earlier versions
-        }
+//        [_tableView enableRefresh:EaseLocalizableString(@"dropRefresh", nil) color:UIColor.redColor];
+//        if (@available(iOS 10.0, *)) {
+//            [_tableView.refreshControl addTarget:self action:@selector(dropdownRefreshTableViewWithData) forControlEvents:UIControlEventValueChanged];
+//        } else {
+//            // Fallback on earlier versions
+//        }
+        _tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(dropdownRefreshTableViewWithData)];
     }
     
     return _tableView;

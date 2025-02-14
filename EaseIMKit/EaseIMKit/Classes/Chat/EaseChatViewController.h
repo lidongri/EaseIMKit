@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,weak)NSString *zhuliStr; // 0不是   1是助理
 @property (nonatomic, weak) NSString *jianpanStr; // 0底部没有导航   1底部有导航
 @property (nonatomic, strong) EMChatBar *chatBar;
+@property (nonatomic,assign) NSInteger comeHomeCounselor;//1来自首页的咨询师列表2会话列表进来
 
 + (EaseChatViewController *)initWithConversationId:(NSString *)aConversationId
                       conversationType:(EMConversationType)aType
