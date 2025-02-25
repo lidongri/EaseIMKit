@@ -12,6 +12,7 @@
 #import "EaseBadgeView.h"
 #import "Easeonry.h"
 #import "UIImageView+EaseWebCache.h"
+#import "BWChatRemarkDataTool.h"
 
 @interface EaseConversationCell()
 
@@ -92,12 +93,12 @@
     
     _nameLabel.font = _viewModel.nameLabelFont;
     _nameLabel.textColor = _viewModel.nameLabelColor;
-    _nameLabel.lineBreakMode = NSLineBreakByCharWrapping;
+    _nameLabel.lineBreakMode = NSLineBreakByTruncatingTail;
     _nameLabel.backgroundColor = [UIColor clearColor];
     
     _detailLabel.font = _viewModel.detailLabelFont;
     _detailLabel.textColor = _viewModel.detailLabelColor;
-    _detailLabel.lineBreakMode = NSLineBreakByCharWrapping;
+    _detailLabel.lineBreakMode = NSLineBreakByTruncatingTail;
     _detailLabel.backgroundColor = [UIColor clearColor];
     
     _timeLabel.font = _viewModel.timeLabelFont;
@@ -213,9 +214,15 @@
         self.avatarView.image = img;
     }
     
+    NSString *nameStr = @"";
     if ([_model respondsToSelector:@selector(showName)]) {
-        self.nameLabel.text = _model.showName;
+        nameStr = _model.showName;
     }
+    NSMutableDictionary *remarkData = [[BWChatRemarkDataTool shareModel] getRemarkData];
+    if ([remarkData[model.easeId] length] > 0) {
+        nameStr = [NSString stringWithFormat:@"%@(%@)",nameStr,remarkData[model.easeId]];
+    }
+    self.nameLabel.text = nameStr;
     
 //    if (model.isTop) {
 //        self.selectionStyle = UITableViewCellSelectionStyleNone;

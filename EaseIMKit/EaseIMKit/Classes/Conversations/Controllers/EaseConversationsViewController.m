@@ -15,7 +15,6 @@
 #import "EaseIMKitManager.h"
 #import "UIViewController+HUD.h"
 
-
 @interface EaseConversationsViewController ()
 <
 UITableViewDelegate,
