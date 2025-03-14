@@ -32,6 +32,7 @@
 @property (nonatomic, strong) UIView *quoteView;
 @property (nonatomic, strong) UILabel *quoteLabel;
 @property (nonatomic, strong) UIButton *quoteDeleteButton;
+@property (nonatomic, assign) BOOL commonBag;
 
 @end
 
@@ -45,6 +46,8 @@
         _previousTextViewContentHeight = kTextViewMinHeight;
         _viewModel = viewModel;
         [self _setupSubviews];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshCommonClick:) name:@"BWChatMessageRefreshNofity" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(closeCommonClick) name:@"BWChatMessageCloseCommonNofity" object:nil];
     }
     
     return self;
@@ -222,6 +225,12 @@
             make.bottom.equalTo(self).offset(-EMVIEWBOTTOMMARGIN);
         }];
     }
+    if (self.commonBag) {
+        self.commonBag = NO;
+        [self.bottomLine Ease_updateConstraints:^(EaseConstraintMaker *make) {
+            make.bottom.equalTo(self).offset(-EMVIEWBOTTOMMARGIN);
+        }];
+    }
     [[NSNotificationCenter defaultCenter] postNotificationName:@"BWConsultUpdateOrderButtonNotify" object:[NSString stringWithFormat:@"%f",EMVIEWBOTTOMMARGIN]];
     self.emojiButton.selected = NO;
     self.conversationToolBarBtn.selected = NO;
@@ -365,6 +374,13 @@
         self.currentMoreView = nil;
         [self _remakeButtonsViewConstraints];
     }
+    //收回常用语键盘
+    if (self.commonBag) {
+        self.commonBag = NO;
+        [self.currentMoreView removeFromSuperview];
+        self.currentMoreView = nil;
+        [self _remakeButtonsViewConstraints];
+    }
     
     if (self.selectedButton) {
         self.selectedButton.selected = NO;
@@ -385,6 +401,7 @@
 
 - (BOOL)_buttonAction:(UIButton *)aButton
 {
+    self.commonBag = NO;
     BOOL isEditing = NO;
     [self.textView resignFirstResponder];
     if (self.currentMoreView) {
@@ -419,6 +436,37 @@
     }
     
     return isEditing;
+}
+
+-(void)refreshCommonClick:(NSNotification *)info
+{
+    if (self.commonBag) {
+        return;
+    }
+    [self.textView resignFirstResponder];
+    self.commonBag = YES;
+    if (self.currentMoreView) {
+        [self.currentMoreView removeFromSuperview];
+        self.currentMoreView = nil;
+    }
+    CGFloat height = [info.object floatValue];
+    [self.bottomLine Ease_remakeConstraints:^(EaseConstraintMaker *make) {
+        make.top.equalTo(self.textView.ease_bottom).offset(5);
+        make.left.equalTo(self);
+        make.right.equalTo(self);
+        make.height.equalTo(@1);
+        make.bottom.Ease_equalTo(-height);
+    }];
+    [self.currentMoreView layoutIfNeeded];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"BWConsultUpdateCommonNotify" object:[NSString stringWithFormat:@"%f",height]];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(chatBarDidShowMoreViewAction)]) {
+        [self.delegate chatBarDidShowMoreViewAction];
+    }
+}
+
+-(void)closeCommonClick
+{
+    [self clearMoreViewAndSelectedButton];
 }
 
 //语音

@@ -199,22 +199,12 @@
     self.chooseView.backgroundColor = _viewModel.chatViewBgColor;
     [self.view addSubview:self.chooseView];
 
-    // 咨询师
-    if ([self.role isEqualToString:@"2"]) {
-        [self.chooseView Ease_remakeConstraints:^(EaseConstraintMaker *make) {
-            make.height.equalTo(@43);
-            make.left.equalTo(self.view);
-            make.right.equalTo(self.view);
-            make.bottom.equalTo(self.chatBar.ease_top);
-        }];
-    }else {
-        [self.chooseView Ease_remakeConstraints:^(EaseConstraintMaker *make) {
-            make.height.equalTo(@0);
-            make.left.equalTo(self.view);
-            make.right.equalTo(self.view);
-            make.bottom.equalTo(self.chatBar.ease_top);
-        }];
-    }
+    [self.chooseView Ease_remakeConstraints:^(EaseConstraintMaker *make) {
+        make.height.equalTo(@0);
+        make.left.equalTo(self.view);
+        make.right.equalTo(self.view);
+        make.bottom.equalTo(self.chatBar.ease_top);
+    }];
     
     self.tableView.backgroundColor = [UIColor colorWithHexString:@"f7f8fa"];
     [self.view addSubview:self.tableView];
@@ -1018,11 +1008,12 @@
     CGRect keyBoardBounds  = [[userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
     CGFloat keyBoardHeight = keyBoardBounds.size.height;
     
-    if([self.jianpanStr isEqualToString:@"1"]){
-        keyBoardHeight   = keyBoardBounds.size.height - 84;
-    }else {
-        keyBoardHeight   = keyBoardBounds.size.height - 20;
-    }
+//    if([self.jianpanStr isEqualToString:@"1"]){
+//        keyBoardHeight   = keyBoardBounds.size.height - 84;
+//    }else {
+//        keyBoardHeight   = keyBoardBounds.size.height - 20;
+//    }
+    keyBoardHeight   = keyBoardBounds.size.height - EMVIEWBOTTOMMARGIN;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"BWConsultUpdateOrderButtonNotify" object:[NSString stringWithFormat:@"%f",keyBoardHeight+EMVIEWBOTTOMMARGIN]];
     // 定义好动作
     void (^animation)(void) = ^void(void) {
